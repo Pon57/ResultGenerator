@@ -1,0 +1,10 @@
+{
+    "require": {
+        "vlucas/phpdotenv": "^2.5"
+    },
+    "autoload": {
+        "psr-4": {
+            "API\\" : "Classes/APIs"
+        }
+    }
+}
