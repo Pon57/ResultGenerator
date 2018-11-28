@@ -4,7 +4,8 @@
     },
     "autoload": {
         "psr-4": {
-            "API\\" : "Classes/APIs"
+            "API\\" : "Classes/APIs",
+			"Classes\\" : "Classes"
         }
     }
 }

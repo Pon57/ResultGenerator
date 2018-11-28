@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8" />
+<title>ResultGenerator</title>
+<meta name="Keywords" content=" ">
+<meta name="Description" content=" ">
+<meta name="robots" content="noindex,nofollow">
+
+<!-- スタイルは特に影響無いです -->
+<style type="text/css">
+    html {
+        background: #eee;
+    }
+    body {
+        background: #fff;
+        box-shadow: 0 0 3px #ddd;
+        width: 600px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+    header {
+        text-align: center;
+        border-bottom: 1px solid #ddd;
+        padding: 0 0 10px 0;
+        margin-bottom: 10px;
+    }
+    .module {
+        border-bottom: 1px solid #ddd;
+        padding-bottom: 10px;
+        margin-bottom: 10px;
+    }
+    .module h2 {
+        text-align: center;
+    }
+    .btn {
+        text-align: center;
+    }
+    .canvas {
+        text-align: center;
+    }
+    footer {
+        text-align: center;
+        font-size: 80%;
+        color: #999;
+    }
+</style>
+
+<!-- 今回はEaselJSのみ使用します-->
+<script src="https://code.createjs.com/easeljs-0.8.2.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script id="script" type="text/javascript" src="my.js"
+ data-param='<?php echo json_safe_encode($results);?>'>
+</script>
+
+</head>
+<body>
+    <header>
+        <h1>スマブラ大会結果ジェネレータ</h1>
+    </header>
+    
+    <div class="module">
+        <h2>入力してください</h2>
+        <dl class="table">
+            <dt>タイトル</dt>
+            <dd><input type="text" name="title" id="title" placeholder="大会名" value="<?= $title ?>" /></dd>
+            <dt>情報</dt>
+            <dd><input type="text" name="info" id="info" placeholder="大会情報" value="<?= $total_entrants ?> entrants - Aichi, Chubu (Japan) [8/4]" /></dd>
+            <dt>参加者</dt>
+<?php	  foreach ($results as $key => $value) { ?>
+            <dd><input type="text" name="player<?= $key ?>" id="player<?= $key ?>" placeholder="1" size="3" value="<?= $value['rank'] ?>" /><input type="text" name="player<?= $key ?>_name" id="player<?= $key ?>_name" placeholder="1" value="<?= $value['name'] ?>" /></dd>
+<?php	  } ?>
+        </dl>
+        <div class="btn">
+            <button id="update">画像生成</button>
+        </div>
+    </div>
+    
+    <div class="module">
+        <h2>結果</h2>
+        <div class="canvas">
+            <!-- width,heightは必須 -->
+            <canvas id="result" width="427" height="<?= 194+$height+30 ?>"></canvas>
+        </div>
+        <div class="btn">
+            <button id="save">画像として保存</button>
+        </div>
+    </div>
+    
+</body>
+</html>

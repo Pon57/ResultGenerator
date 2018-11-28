@@ -35,8 +35,6 @@
 		
 		logo.x = stage.canvas.width/2-logoImg.width/2*logo.scaleX;
 		logo.y = 30;
-
-		
 		
 		stage.addChild(bg_shape);//白い四角をステージに先に置く
 		stage.addChild(logo);
@@ -169,8 +167,12 @@
 		});
 		
 		//「画像として保存」ボタンが押された時の処理
-		$('#saveform').on('submit',function(){
-			save();
+		//$('#saveform').on('submit',function(){
+		//	save();
+		//});
+		$('#save').on('click',function(){
+			var data = stage.toDataURL("image/png");
+			window.open(data);
 		});
 	});
 })(jQuery);

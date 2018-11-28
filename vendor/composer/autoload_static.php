@@ -11,6 +11,10 @@ class ComposerStaticInit199d2f5298546e653489092fde1a7d45
         array (
             'Dotenv\\' => 7,
         ),
+        'C' => 
+        array (
+            'Classes\\' => 8,
+        ),
         'A' => 
         array (
             'API\\' => 4,
@@ -21,6 +25,10 @@ class ComposerStaticInit199d2f5298546e653489092fde1a7d45
         'Dotenv\\' => 
         array (
             0 => __DIR__ . '/..' . '/vlucas/phpdotenv/src',
+        ),
+        'Classes\\' => 
+        array (
+            0 => __DIR__ . '/../..' . '/Classes',
         ),
         'API\\' => 
         array (

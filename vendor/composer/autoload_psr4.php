@@ -7,5 +7,6 @@ $baseDir = dirname($vendorDir);
 
 return array(
     'Dotenv\\' => array($vendorDir . '/vlucas/phpdotenv/src'),
+    'Classes\\' => array($baseDir . '/Classes'),
     'API\\' => array($baseDir . '/Classes/APIs'),
 );
