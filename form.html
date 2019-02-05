@@ -60,7 +60,6 @@
 <script id="script" type="text/javascript" src="my.js"
  data-param='<?php echo json_safe_encode($results);?>' data-fighters='<?php echo json_safe_encode($fighters);?>'>
 </script>
-
 <script src="image-picker/image-picker.js"></script>
 <link rel="stylesheet" type="text/css" href="image-picker/image-picker.css">
 
@@ -85,13 +84,14 @@
 			<div class="uk-container">
 	            <dd class="standings">
 	            	<input class="uk-input uk-form-width-xsmall" type="text" name="player<?= $key ?>" id="player<?= $key ?>" placeholder="1" size="3" value="<?= $value['rank'] ?>" /><input class="uk-input uk-form-width-medium" type="text" name="player<?= $key ?>_name" id="player<?= $key ?>_name" placeholder="1" value="<?= $value['name'] ?>" />
-					<a class="uk-button uk-button-default" href="#player<?= $key ?>_characters" uk-toggle>Characters</a>
+					<a id="characters" class="uk-button uk-button-default" href="#player<?= $key ?>_characters" tag="player<?= $key ?>_characters" uk-toggle>Characters</a>
 					<div id="player<?= $key ?>_characters" uk-modal>
 					    <div class="uk-modal-dialog">
 					    <div class="picker uk-modal-body" uk-overflow-auto>
 <?php					  foreach($fighters as $fighter): ?>
 							<h2 class="uk-modal-title"><?= $fighter['name'] ?></h2>
-							<select id="player<?= $key ?>_character<?= $fighter['id'] ?>" name="player<?= $key ?>_character<?= $fighter['id'] ?>" multiple="multiple" class="image-picker uk-width-expand">
+							<select id="player<?= $key ?>_character<?= $fighter['id'] ?>" name="player<?= $key ?>_character<?= $fighter['id'] ?>" class="player<?= $key ?>_characters uk-width-expand">
+								<option value=""></option>
 <?php 						  for($i = 0;$i < $fighter['color']; $i++): ?>
 								<option data-img-src="stockicons/<?= $fighter['slug'] ?>_<?= str_pad($i+1, 2, '0', STR_PAD_LEFT) ?>.png" value="stockicons/<?= $fighter['slug'] ?>_<?= str_pad($i+1, 2, '0', STR_PAD_LEFT) ?>.png"></option>
 <?php						  endfor; ?>
@@ -122,11 +122,16 @@
         </div>
     </div>
     <script type="text/javascript">
-
-    jQuery("select.image-picker").imagepicker({
-      hide_select:  false,
-    });
-
-  </script>
+	  var done = [];
+	  $('[id=characters]').on('click', function() {
+		var tag = $(this, "[id=characters]").attr("tag");
+		if(!done[tag]){
+		  $("select."+tag).imagepicker({
+	        hide_select:  false,
+	      });
+	      done[tag] = true;
+		}
+	  });
+	</script>
 </body>
 </html>
