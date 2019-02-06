@@ -7,6 +7,9 @@
 <meta name="Description" content=" ">
 <meta name="robots" content="noindex,nofollow">
 
+<link rel="stylesheet" type="text/css" href="css/uikit.css">
+<script src="js/uikit.js"></script>
+
 <!-- スタイルは特に影響無いです -->
 <style type="text/css">
     html {
@@ -44,35 +47,67 @@
         font-size: 80%;
         color: #999;
     }
+    .standings {
+	    width: 80%;
+		margin: 0 auto;
+		max-width: 600px;
+    }
 </style>
 
 <!-- 今回はEaselJSのみ使用します-->
 <script src="https://code.createjs.com/easeljs-0.8.2.min.js"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 <script id="script" type="text/javascript" src="my.js"
- data-param='<?php echo json_safe_encode($results);?>'>
+ data-param='<?php echo json_safe_encode($results);?>' data-fighters='<?php echo json_safe_encode($fighters);?>'>
 </script>
+<script src="image-picker/image-picker.js"></script>
+<link rel="stylesheet" type="text/css" href="image-picker/image-picker.css">
 
 </head>
 <body>
     <header>
         <h1>スマブラ大会結果ジェネレータ</h1>
     </header>
-    
     <div class="module">
-        <h2>入力してください</h2>
+        <h2>大会情報</h2>
         <dl class="table">
+	        <form action="/" method="post">
+		        <dt>URL</dt>
+		        <dd><input class="uk-input uk-width-5-6" type="text" name="url" id="url" placeholder="大会名" value="<?= $url ?>" /><input class="uk-button uk-button-default uk-width-1-6" type='submit' value='変更'></dd>
+	        </form>
             <dt>タイトル</dt>
-            <dd><input type="text" name="title" id="title" placeholder="大会名" value="<?= $title ?>" /></dd>
+            <dd><input class="uk-input" type="text" name="title" id="title" placeholder="大会名" value="<?= $title ?>" /></dd>
             <dt>情報</dt>
-            <dd><input type="text" name="info" id="info" placeholder="大会情報" value="<?= $total_entrants ?> entrants - Aichi, Chubu (Japan) [8/4]" /></dd>
+            <dd><input class="uk-input" type="text" name="info" id="info" placeholder="大会情報" value="<?= $total_entrants ?> entrants - 都道府県, 地方 (Japan) [月/日]" /></dd>
             <dt>参加者</dt>
 <?php	  foreach ($results as $key => $value) { ?>
-            <dd><input type="text" name="player<?= $key ?>" id="player<?= $key ?>" placeholder="1" size="3" value="<?= $value['rank'] ?>" /><input type="text" name="player<?= $key ?>_name" id="player<?= $key ?>_name" placeholder="1" value="<?= $value['name'] ?>" /></dd>
+			<div class="uk-container">
+	            <dd class="standings">
+	            	<input class="uk-input uk-form-width-xsmall" type="text" name="player<?= $key ?>" id="player<?= $key ?>" placeholder="1" size="3" value="<?= $value['rank'] ?>" /><input class="uk-input uk-form-width-medium" type="text" name="player<?= $key ?>_name" id="player<?= $key ?>_name" placeholder="1" value="<?= $value['name'] ?>" />
+					<a id="characters" class="uk-button uk-button-default" href="#player<?= $key ?>_characters" tag="player<?= $key ?>_characters" uk-toggle>Characters</a>
+					<div id="player<?= $key ?>_characters" uk-modal>
+					    <div class="uk-modal-dialog">
+					    <div class="picker uk-modal-body" uk-overflow-auto>
+<?php					  foreach($fighters as $fighter): ?>
+							<h2 class="uk-modal-title"><?= $fighter['name'] ?></h2>
+							<select id="player<?= $key ?>_character<?= $fighter['id'] ?>" name="player<?= $key ?>_character<?= $fighter['id'] ?>" class="player<?= $key ?>_characters uk-width-expand">
+								<option value=""></option>
+<?php 						  for($i = 0;$i < $fighter['color']; $i++): ?>
+								<option data-img-src="stockicons/<?= $fighter['slug'] ?>_<?= str_pad($i+1, 2, '0', STR_PAD_LEFT) ?>.png" value="stockicons/<?= $fighter['slug'] ?>_<?= str_pad($i+1, 2, '0', STR_PAD_LEFT) ?>.png"></option>
+<?php						  endfor; ?>
+							</select>
+<?php					  endforeach; ?>
+						</div>
+						<div class="uk-modal-footer uk-text-right">
+						    <button class="uk-button uk-button-default uk-modal-close" type="button">閉じる</button>
+						</div>
+					</div>
+	            </dd>
+            </div>
 <?php	  } ?>
         </dl>
         <div class="btn">
-            <button id="update">画像生成</button>
+            <button class="uk-button uk-button-default" id="update">画像生成</button>
         </div>
     </div>
     
@@ -83,9 +118,20 @@
             <canvas id="result" width="427" height="<?= 194+$height+30 ?>"></canvas>
         </div>
         <div class="btn">
-            <button id="save">画像として保存</button>
+            <button class="uk-button uk-button-default" id="save">画像として保存</button>
         </div>
     </div>
-    
+    <script type="text/javascript">
+	  var done = [];
+	  $('[id=characters]').on('click', function() {
+		var tag = $(this, "[id=characters]").attr("tag");
+		if(!done[tag]){
+		  $("select."+tag).imagepicker({
+	        hide_select:  false,
+	      });
+	      done[tag] = true;
+		}
+	  });
+	</script>
 </body>
 </html>

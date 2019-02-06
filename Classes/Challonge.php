@@ -21,7 +21,11 @@ class Challonge extends Functions
         $this->challonge = new ChallongeAPI($challonge_api);
         $this->challonge->verify_ssl = false;
         $url_array = explode('/', $url);
-        $this->tournament_slug = $url_array[3];
+        if ($url_array[3] == 'ja') {
+	        $this->tournament_slug = $url_array[4];
+        } else {
+	        $this->tournament_slug = $url_array[3];
+        }
         $this->execute();
     }
 
