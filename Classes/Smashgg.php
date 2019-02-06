@@ -65,11 +65,12 @@ class Smashgg extends Functions
         $sum_rank = 2;
         $lowest_rank = 4;
         $border = 9;
+        $total_entrants = $this->getTotalEntrants() > 96 ? 96 : $this->getTotalEntrants();
 
-        while ($border <= $this->getTotalEntrants()) {
+        while ($border <= $total_entrants) {
             for ($i = 0; $i < 2; $i++) {
                 $border += $sum;
-                if ($border > $this->getTotalEntrants()) {
+                if ($border > $total_entrants) {
                     break;
                 }
                 $lowest_rank += $sum_rank;
@@ -85,20 +86,23 @@ class Smashgg extends Functions
         $last_page = ceil($this->standings['total_count'] / 25);
         $current_page = 1;
         $results = [];
-        while ($last_page >= $current_page) {
-            foreach ($this->standings['items']['entities']['entrants'] as $entrant) {
-                if ($entrant['finalPlacement'] > $this->lowest_rank) {
-                    break;
+        try {
+            while (true) {
+                foreach ($this->standings['items']['entities']['entrants'] as $entrant) {
+                    if ($entrant['finalPlacement'] > $this->lowest_rank) {
+                        throw new \Exception('break');
+                    }
+                    if ($entrant['finalPlacement']) {
+                        $results[(integer)$entrant['playerIds'][$entrant['participantIds'][0]]]['name'] = (string)$entrant['mutations']['players'][$entrant['playerIds'][$entrant['participantIds'][0]]]['gamerTag'];
+                    }
+                    $results[(integer)$entrant['playerIds'][$entrant['participantIds'][0]]]['rank'] = $entrant['finalPlacement'];
+                    $results[(integer)$entrant['playerIds'][$entrant['participantIds'][0]]]['in-winner'] = 1;
+                    $results[(integer)$entrant['playerIds'][$entrant['participantIds'][0]]]['lost-loser'] = 0;
                 }
-                if ($entrant['finalPlacement']) {
-                    $results[(integer)$entrant['playerIds'][$entrant['participantIds'][0]]]['name'] = (string)$entrant['mutations']['players'][$entrant['playerIds'][$entrant['participantIds'][0]]]['gamerTag'];
-                }
-                $results[(integer)$entrant['playerIds'][$entrant['participantIds'][0]]]['rank'] = $entrant['finalPlacement'];
-                $results[(integer)$entrant['playerIds'][$entrant['participantIds'][0]]]['in-winner'] = 1;
-                $results[(integer)$entrant['playerIds'][$entrant['participantIds'][0]]]['lost-loser'] = 0;
+                $current_page++;
+                $this->standings = json_decode($this->smashgg->getStandings($this->tournament_slug, $this->event_slug, $current_page), true);
             }
-            $current_page++;
-            $this->standings = json_decode($this->smashgg->getStandings($this->tournament_slug, $this->event_slug, $current_page), true);
+        } catch (\Exception $e) {
         }
         $this->results = $results;
     }

@@ -3,16 +3,25 @@
 	var init_canvas = function(){
 		var $script = $('#script');
 		results = JSON.parse($script.attr('data-param'));
+		fighters = JSON.parse($script.attr('data-fighters'));
 		//確認
-		logoImg = new Image();
-		logoImg.src = 'karisuma.png';
 		stage = new createjs.Stage('result');
-		jpImg = new Image();
-		jpImg.src = 'jp.png';
 		bg_shape = new createjs.Shape();//shapeインスタンスを作る
 		bg_shape.graphics.f("white").dr(0,0,stage.canvas.width,stage.canvas.height);//形を白い四角に決める、幅と高さはステージと同サイズにする
-		genImage();
-		stage.update();
+		logoImg = new Image();
+		logoImg.src = 'umebura.png';
+		logoImg.onload = function() {
+			jpImg = new Image();
+			jpImg.src = 'jp.png';
+			jpImg.onload = function() {
+				omakaseImg = new Image();
+				omakaseImg.src = 'stockicons/omakase_01.png';
+				omakaseImg.onload = function() {
+					genImage();
+					stage.update();	
+				}
+			};
+		};
 	}
 
 	var strWidth = function(str, font) {
@@ -110,27 +119,36 @@
 				player.x = region.x+jpImg.width+10; //X座標
 				player.y = obj.y; //Y座標
 				stage.addChild(player);
-
-				var charImg = new Image();
-				charImg.src = 'stockicons/bayonetta_01.png';
-				
-				var character = new createjs.Bitmap(charImg);
-				character.scaleY = (jpImg.height+10) / character.getBounds().height;
-				character.scaleX = character.scaleY;
-				character.x = player.x+strWidth(name,obj.font)-2;
-				character.y = region.y-5;
-				stage.addChild(character);
-				
-
-				var charImg2 = new Image();
-				charImg2.src = 'stockicons/captain_03.png';
-				var character2 = new createjs.Bitmap(charImg2);
-				character2.scaleY = (jpImg.height+10) / character2.getBounds().height;
-				character2.scaleX = character.scaleY;
-				character2.x = character.x+charImg2.width*character2.scaleX-3;
-				character2.y = character.y;
-				stage.addChild(character2);
-
+				var before_character;
+				$.each(fighters,function(key2,value2){
+					var charImg = new Image();
+					var character = new createjs.Bitmap(charImg);
+					if ($('#' + key + '_character' + value2['id'] + ' option:selected').val()){
+						charImg.src = $('#' + key + '_character' + value2['id'] + ' option:selected').val();
+						if (before_character) {
+							character.scaleY = (jpImg.height+10) / character.getBounds().height;
+							character.scaleX = before_character.scaleY;
+							character.x = before_character.x+charImg.width*character.scaleX-3;
+							character.y = before_character.y;
+						} else {
+							character.scaleY = (jpImg.height+10) / character.getBounds().height;
+							character.scaleX = character.scaleY;
+							character.x = player.x+strWidth(name,obj.font)-2;
+							character.y = region.y-5;
+						}
+						stage.addChild(character);
+						before_character = character;	
+					}
+				});
+				if(!before_character) {
+					var character = new createjs.Bitmap(omakaseImg);
+					character.scaleY = (jpImg.height+10) / character.getBounds().height;
+					character.scaleX = character.scaleY;
+					character.x = player.x+strWidth(name,obj.font)-2;
+					character.y = region.y-5;
+					stage.addChild(character);
+					before_character = character;
+				}
 			}
 			
 			stage.addChild(obj);
@@ -139,19 +157,6 @@
 
 		
 	//保存させる処理
-	//ここだけはブラウザ上で完結できなかった…。
-	//base64をデコードしてheaderを付加してechoするだけのPHPへPOSTしています
-	var save = function(){
-		var png = stage.toDataURL('image/png'); //base64エンコードした画像データ生成
-		if(png){
-			$('input[name="img"]').remove();
-			$('#saveform').append('<input type="hidden" name="img" value="'+png+'" />');
-			return true;
-		} else {
-			return false;
-		}
-	}
-	
 	$(function(){
 		//canvasオブジェクトを事前に定義しておく
 		$(document).ready( function(){
@@ -166,10 +171,6 @@
 			stage.update();
 		});
 		
-		//「画像として保存」ボタンが押された時の処理
-		//$('#saveform').on('submit',function(){
-		//	save();
-		//});
 		$('#save').on('click',function(){
 			var data = stage.toDataURL("image/png");
 			window.open(data);
